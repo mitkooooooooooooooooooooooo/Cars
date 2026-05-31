@@ -55,7 +55,6 @@ namespace Cars.Data
             {
                 var defaultDealer = new Dealer
                 {
-                    Name = "Apex Motorsports Management",
                     PhoneNumber = "+1-555-0199",
                     UserId = defaultAdmin.Id
                 };
@@ -92,6 +91,6 @@ namespace Cars.Data
                 await context.Cars.AddRangeAsync(sampleCars);
                 await context.SaveChangesAsync();
             }
-        }// aaaaaa
+        }
     }
 }
