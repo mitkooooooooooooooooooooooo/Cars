@@ -1,42 +1,103 @@
 ﻿@model IEnumerable<Cars.Data.Models.Car>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
 
-@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center mb-5">
-    <h1 class="display-4">Welcome to Our Car Dealership</h1>
-    <p class="lead">Find your next perfect drive below.</p>
-</div>
-
-<div class="row">
-    @if (!Model.Any())
-    {
-        <div class="col-12 text-center">
-            <p class="text-muted">No cars available at the moment. Check back soon!</p>
+<div class="container-fluid bg-light min-vh-100 py-5">
+    <div class="container">
+        <div class="row mb-5 align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-4 fw-bold text-dark mb-2">Elite Showroom Stock</h1>
+                <p class="lead text-secondary fs-5">Discover engineered precision and track-focused performance vehicles.</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Dealer" asp-action="Create" class="btn btn-primary btn-lg shadow-sm px-4 rounded-pill fw-semibold border-0 bg-gradient">
+                        <i class="bi bi-plus-lg me-2"></i>Add New Listing
+                    </a>
+                }
+            </div>
         </div>
-    }
-    else
-    {
-        @foreach (var car in Model)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <img src="@car.ImageUrl" class="card-img-top" alt="@car.Make @car.Model" style="height: 200px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title">@car.Make @car.Model</h5>
-                        <p class="card-text text-truncate">@car.Description</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="badge bg-secondary">@car.Category.Name</span>
-                            <span class="badge bg-primary">@car.Year</span>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
-                        <span class="h5 text-success mb-0">$@car.Price.ToString("N2")</span>
-                        <a asp-controller="Cars" asp-action="Details" asp-route-id="@car.Id" class="btn btn-sm btn-outline-primary">View Details</a>
+
+        <hr class="border-secondary opacity-25 mb-5">
+
+        <div class="row g-4">
+            @if (!Model.Any())
+            {
+                <div class="col-12 text-center py-5">
+                    <div class="p-5 bg-white rounded-4 shadow-sm border border-light max-width-md mx-auto">
+                        <h3 class="text-dark fw-bold mb-2">Showroom is Empty</h3>
+                        <p class="text-secondary mb-0">Our current inventory has cleared out. Check back soon for fresh arrivals!</p>
                     </div>
                 </div>
-            </div>
-        }
-    }
+            }
+            else
+            {
+                @foreach (var car in Model)
+                {
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 rounded-4 shadow-sm overflow-hidden bg-white hover-up transition-all">
+                            <div class="position-relative overflow-hidden bg-dark" style="height: 240px;">
+                                <img src="@car.ImageUrl" class="w-100 h-100 object-fit-cover opacity-90 transition-zoom" alt="@car.Make @car.Model">
+
+                                @if (car.IsSold)
+                                {
+                                    <span class="position-absolute top-3 end-3 badge bg-danger px-3 py-2 rounded-pill fw-bold uppercase letter-spacing-1 shadow-sm">
+                                        Sold Out
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="position-absolute top-3 end-3 badge bg-success px-3 py-2 rounded-pill fw-bold shadow-sm">
+                                        Available
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="card-body p-4 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h4 class="card-title fw-bold text-dark mb-0">@car.Make @car.Model</h4>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-10 px-2.5 py-1 rounded-3 font-monospace small">
+                                        @car.Year
+                                    </span>
+                                </div>
+
+                                <p class="card-text text-secondary small flex-grow-1 lh-relaxed mb-4">
+                                    @car.Description
+                                </p>
+
+                                <div class="d-flex justify-content-between align-items-center pt-3 border-top border-light mt-auto">
+                                    <div>
+                                        <span class="text-muted text-uppercase font-monospace d-block small tracking-wider" style="font-size: 0.65rem;">MSRP Value</span>
+                                        <h3 class="text-primary fw-extrabold mb-0">@car.Price.ToString("C0")</h3>
+                                    </div>
+
+                                    <div style="min-width: 140px;">
+                                        @if (car.IsSold)
+                                        {
+                                            <button class="btn btn-outline-secondary w-100 rounded-pill py-2 border-2 fw-bold text-uppercase font-monospace disabled" disabled style="font-size: 0.8rem;">
+                                                Archived
+                                            </button>
+                                        }
+                                        else if (SignInManager.IsSignedIn(User) && User.IsInRole("User"))
+                                        {
+                                            <form asp-controller="Shop" asp-action="Buy" asp-route-id="@car.Id" method="post">
+                                                <button type="submit" class="btn btn-dark w-100 rounded-pill py-2 fw-bold text-uppercase tracking-wide shadow-sm hover-brightness" style="font-size: 0.8rem;">
+                                                    Instant Buy
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted d-block text-center small fst-italic">Sign in to claim</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
 </div>
