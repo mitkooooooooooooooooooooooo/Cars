@@ -21,6 +21,14 @@
                 Age = 34,
                 Role = "Admin"
             },
+             new MockUserProfile
+            {
+                Email = "vip-customer@test.com",
+                Password = "VipPass123!",
+                FullName = "Jhon",
+                Age = 23,
+                Role = "Admin"
+            },
             new MockUserProfile
             {
                 Email = "buyer@test.com",
