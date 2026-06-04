@@ -1,6 +1,4 @@
 ﻿@model IEnumerable<Cars.Data.Models.Car>
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
 
 <div class="container-fluid bg-light min-vh-100 py-5">
     <div class="container">
@@ -10,7 +8,7 @@
                 <p class="lead text-secondary fs-5">Discover engineered precision and track-focused performance vehicles.</p>
             </div>
             <div class="col-md-4 text-md-end">
-                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                 {
                     <a asp-controller="Dealer" asp-action="Create" class="btn btn-primary btn-lg shadow-sm px-4 rounded-pill fw-semibold border-0 bg-gradient">
                         <i class="bi bi-plus-lg me-2"></i>Add New Listing
@@ -79,7 +77,7 @@
                                                 Archived
                                             </button>
                                         }
-                                        else if (SignInManager.IsSignedIn(User) && User.IsInRole("User"))
+                                        else if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("User"))
                                         {
                                             <form asp-controller="Shop" asp-action="Buy" asp-route-id="@car.Id" method="post">
                                                 <button type="submit" class="btn btn-dark w-100 rounded-pill py-2 fw-bold text-uppercase tracking-wide shadow-sm hover-brightness" style="font-size: 0.8rem;">

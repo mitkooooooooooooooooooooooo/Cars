@@ -1,6 +1,7 @@
 using Cars.Data;
 using Cars.Services;
 using Cars.Services.Contracts;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,16 +19,12 @@ namespace Cars
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString, b => b.MigrationsAssembly("Cars.Data")));
 
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => {
-                options.SignIn.RequireConfirmedAccount = false;
-                options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireNonAlphanumeric = true;
-                options.Password.RequiredLength = 6;
-            })
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Login";
+                    options.LogoutPath = "/Account/Logout";
+                });
 
             builder.Services.AddScoped<ICarService, CarService>();
 
@@ -47,6 +44,7 @@ namespace Cars
 
             app.UseRouting();
 
+           
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -57,21 +55,19 @@ namespace Cars
 
             app.MapRazorPages();
 
+            // seeding 
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 try
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
-                    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-                    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
-
-                    DatabaseSeeder.SeedAsync(context, roleManager, userManager).GetAwaiter().GetResult();
+                    DatabaseSeeder.SeedAsync(context).GetAwaiter().GetResult();
                 }
                 catch (Exception ex)
                 {
                     var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred during startup seeding.");
+                    logger.LogError(ex, "An error occurred during startup showroom seeding.");
                 }
             }
 
