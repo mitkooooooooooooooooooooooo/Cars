@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace Cars.Data.Models
 {
@@ -12,11 +13,10 @@ namespace Cars.Data.Models
         [MaxLength(15)]
         public string PhoneNumber { get; set; } = null!;
 
-        [Required]
-        public string UserId { get; set; } = null!;
+        public string? UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual ApplicationUser User { get; set; } = null!;
+        public virtual IdentityUser? User { get; set; }
 
         public virtual ICollection<Car> Cars { get; set; } = new HashSet<Car>();
     }

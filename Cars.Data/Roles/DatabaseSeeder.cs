@@ -19,8 +19,8 @@ namespace Cars.Data
                 }
             }
 
-            // seed teh admni
-            string adminEmail = "gogo@gogo.com";
+            // seed teh admin
+            string adminEmail = "admin@dealership.com";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null)
             {
@@ -69,8 +69,8 @@ namespace Cars.Data
             {
                 var defaultDealer = new Dealer
                 {
-                    PhoneNumber = "+1-555-0199",
-                    UserId = adminUser.Id
+                    PhoneNumber = "555-AUTO",
+                    UserId = adminUser?.Id 
                 };
                 await context.Dealers.AddAsync(defaultDealer);
                 await context.SaveChangesAsync();
@@ -116,7 +116,7 @@ namespace Cars.Data
                         Price = 200000.00m,
                         Year = 2023,
                         IsSold = false,
-                        ImageUrl = "https://www.marshallgoldmanbh.com/imagetag/3996/4/l/Used-2020-Lamborghini-Huracan-EVO-Spyder-1728921891.jpg",
+                        ImageUrl = "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&q=80&w=800",
                         CategoryId = sportsCat.Id,
                         DealerId = dealerId
                     }

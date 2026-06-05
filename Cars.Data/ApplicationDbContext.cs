@@ -21,11 +21,14 @@ namespace Cars.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Dealer>()
-                .HasOne<IdentityUser>()
+                .Property(d => d.UserId)
+                .IsRequired(false);
+
+            modelBuilder.Entity<Dealer>()
+                .HasOne(d => d.User)
                 .WithMany()
                 .HasForeignKey(d => d.UserId)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }
