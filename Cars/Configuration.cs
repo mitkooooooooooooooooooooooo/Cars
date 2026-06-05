@@ -16,7 +16,7 @@
             new MockUserProfile
             {
                 Email = "admin@dealership.com",
-                Password = "Admin123!",
+                Password = "admin123!",
                 FullName = "Gogo",
                 Age = 34,
                 Role = "Admin"
@@ -24,7 +24,7 @@
              new MockUserProfile
             {
                 Email = "vip-customer@test.com",
-                Password = "VipPass123!",
+                Password = "554!",
                 FullName = "Jhon",
                 Age = 23,
                 Role = "Admin"

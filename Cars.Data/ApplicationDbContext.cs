@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Cars.Data.Models;
 
 namespace Cars.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -19,11 +21,11 @@ namespace Cars.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Dealer>()
-                .Ignore(d => d.User);
-
-            modelBuilder.Entity<Dealer>()
-                .Property(d => d.UserId)
-                .IsRequired(false);
+                .HasOne<IdentityUser>()
+                .WithMany()
+                .HasForeignKey(d => d.UserId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

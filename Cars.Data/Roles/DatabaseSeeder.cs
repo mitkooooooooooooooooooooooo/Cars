@@ -1,20 +1,63 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Cars.Data.Models;
 
 namespace Cars.Data
 {
     public static class DatabaseSeeder
     {
-        public static async Task SeedAsync(ApplicationDbContext context)
+        public static async Task SeedAsync(ApplicationDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             await context.Database.EnsureCreatedAsync();
+
+            string[] roleNames = { "Administrator", "User" };
+            foreach (var roleName in roleNames)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+
+            // seed teh admni
+            string adminEmail = "gogo@gogo.com";
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            if (adminUser == null)
+            {
+                adminUser = new IdentityUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    EmailConfirmed = true
+                };
+                var result = await userManager.CreateAsync(adminUser, "admin123!");
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(adminUser, "Administrator");
+                }
+            }
+
+            string buyerEmail = "buyer@test.com";
+            var buyerUser = await userManager.FindByEmailAsync(buyerEmail);
+            if (buyerUser == null)
+            {
+                buyerUser = new IdentityUser
+                {
+                    UserName = buyerEmail,
+                    Email = buyerEmail,
+                    EmailConfirmed = true
+                };
+                var result = await userManager.CreateAsync(buyerUser, "User123!");
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(buyerUser, "User");
+                }
+            }
 
             if (!context.Categories.Any())
             {
                 var categories = new List<Category>
                 {
-                    new Category { Name = "Sedan" },
-                    new Category { Name = "SUV" },
                     new Category { Name = "Sports Car" },
                     new Category { Name = "Electric" }
                 };
@@ -27,13 +70,12 @@ namespace Cars.Data
                 var defaultDealer = new Dealer
                 {
                     PhoneNumber = "+1-555-0199",
-                    UserId = null
+                    UserId = adminUser.Id
                 };
                 await context.Dealers.AddAsync(defaultDealer);
                 await context.SaveChangesAsync();
             }
 
-            // Inventory 
             if (!context.Cars.Any())
             {
                 var sportsCat = await context.Categories.FirstAsync(c => c.Name == "Sports Car");
@@ -58,7 +100,7 @@ namespace Cars.Data
                     {
                         Make = "Tesla",
                         Model = "Model S Plaid",
-                        Description = "Tri-motor all-wheel drive setup delivering 1,020 horsepower with neck-snapping acceleration.",
+                        Description = "Tri-motor all-wheel drive setup delivering 1,020 horsepower.",
                         Price = 89990.00m,
                         Year = 2024,
                         IsSold = false,
@@ -75,7 +117,7 @@ namespace Cars.Data
                         Year = 2023,
                         IsSold = false,
                         ImageUrl = "https://www.marshallgoldmanbh.com/imagetag/3996/4/l/Used-2020-Lamborghini-Huracan-EVO-Spyder-1728921891.jpg",
-                        CategoryId = sportsCat.Id, // Perfectly categorized under Sports Car!
+                        CategoryId = sportsCat.Id,
                         DealerId = dealerId
                     }
                 };

@@ -1,52 +1,43 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Cars.Controllers
 {
     public class AccountController : Controller
     {
-        [HttpGet]
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
+
+        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        {
+            _signInManager = signInManager;
+            _userManager = userManager;
+        }
+
         public IActionResult Login()
         {
+            if (User.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
-            // user data matching
-            var user = Configuration.MockUsers.FirstOrDefault(u =>
-                u.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
-                u.Password == password);
+            // user from sql table
+            var result = await _signInManager.PasswordSignInAsync(email, password, isPersistent: false, lockoutOnFailure: false);
 
-            if (user != null)
+            if (result.Succeeded)
             {
-                // user/admin
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.FullName),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role),
-                    new Claim("Age", user.Age.ToString())
-                };
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
                 return RedirectToAction("Index", "Home");
             }
 
-            ModelState.AddModelError("", "Invalid login credentials. Check Configuration.cs names!");
+            ModelState.AddModelError("", "Invalid login credentials recorded in system database tables.");
             return View();
         }
 
-        [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
     }
