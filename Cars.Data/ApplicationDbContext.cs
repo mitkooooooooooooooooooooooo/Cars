@@ -81,6 +81,18 @@ namespace Cars.Data
                     ImageUrl = "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80&w=800",
                     CategoryId = category.Id,
                     DealerId = dealer.Id
+                },
+                 new Car
+                {
+                    Make = "Lamborghini",
+                    Model = "Huracan EVO Spyder",
+                    Description = "Tri-motor all-wheel drive setup delivering 1,020 horsepower with neck-snapping acceleration.",
+                    Price = 200000.00m,
+                    Year = 2023,
+                    IsSold = false,
+                    ImageUrl = "https://www.marshallgoldmanbh.com/imagetag/3996/4/l/Used-2020-Lamborghini-Huracan-EVO-Spyder-1728921891.jpg",
+                    CategoryId = category.Id,
+                    DealerId = dealer.Id
                 }
             };
 
