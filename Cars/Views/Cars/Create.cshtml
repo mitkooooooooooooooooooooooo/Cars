@@ -1,0 +1,64 @@
+﻿@model Cars.Data.Models.Car
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow border-0 rounded-4 p-4">
+                <h2 class="fw-bold mb-2">Inventory Intake</h2>
+                <p class="text-muted mb-4">Introduce a new performance asset to the active showroom fleet.</p>
+
+                <form method="post" action="/Cars/Create">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Make / Brand</label>
+                            <input type="text" name="Make" class="form-control" required placeholder="e.g., Lamborghini" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Model Variant</label>
+                            <input type="text" name="Model" class="form-control" required placeholder="e.g., Revuelto" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">MSRP Price ($)</label>
+                            <input type="number" step="0.01" name="Price" class="form-control" required placeholder="600000" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Production Year</label>
+                            <input type="number" name="Year" class="form-control" required placeholder="2026" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Showroom Allocation</label>
+                            <select name="DealerId" class="form-select" required>
+                                @foreach (var dealer in ViewBag.Dealers)
+                                {
+                                    <option value="@dealer.Id">Dealer ID: @dealer.Id (@dealer.PhoneNumber)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Classification Category</label>
+                            <select name="CategoryId" class="form-select" required>
+                                @foreach (var cat in ViewBag.Categories)
+                                {
+                                    <option value="@cat.Id">@cat.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Vehicle Cover Image Link</label>
+                            <input type="url" name="ImageUrl" class="form-control" required placeholder="https://images.unsplash.com/..." />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Asset Specifications & Description</label>
+                            <textarea name="Description" class="form-control" rows="3" required placeholder="Naturally aspirated engine details..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-dark px-4 fw-bold">Publish to Showroom</button>
+                        <a href="/Home/Index" class="btn btn-outline-secondary px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

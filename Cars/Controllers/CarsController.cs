@@ -60,10 +60,16 @@ namespace Cars.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Car car)
         {
+            ModelState.Remove("Category");
+            ModelState.Remove("Dealer");
+
             if (ModelState.IsValid)
             {
                 await _context.Cars.AddAsync(car);
                 await _context.SaveChangesAsync();
+
+                TempData["Message"] = $"Successfully added the {car.Make} {car.Model} to the showroom grid!";
+
                 return RedirectToAction("Index", "Home");
             }
 
