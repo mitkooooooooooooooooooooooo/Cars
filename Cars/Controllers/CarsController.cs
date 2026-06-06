@@ -77,5 +77,61 @@ namespace Cars.Controllers
             ViewBag.Dealers = await _context.Dealers.ToListAsync();
             return View(car);
         }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var car = await _context.Cars.FindAsync(id);
+            if (car == null) return NotFound();
+            _context.Cars.Remove(car);
+
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] = $"Successfully removed the {car.Make} {car.Model} from the showroom database.";
+
+            return RedirectToAction("Index", "Home");
+        }
+        // fir edits
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var car = await _context.Cars.FindAsync(id);
+            if (car == null) return NotFound();
+
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+            ViewBag.Dealers = await _context.Dealers.ToListAsync();
+            return View(car);
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, Car car)
+        {
+            if (id != car.Id) return NotFound();
+            ModelState.Remove("Category");
+            ModelState.Remove("Dealer");
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(car);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Cars.Any(e => e.Id == car.Id)) return NotFound();
+                    throw;
+                }
+
+                TempData["Message"] = $"Successfully updated specifications for the {car.Make} {car.Model}!";
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+            ViewBag.Dealers = await _context.Dealers.ToListAsync();
+            return View(car);
+        }
     }
 }

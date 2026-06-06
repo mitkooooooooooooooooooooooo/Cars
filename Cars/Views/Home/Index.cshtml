@@ -57,11 +57,26 @@
                                 }
                                 else if (User.IsInRole("Administrator"))
                                 {
-                                    <form method="post" action="/Cars/ToggleSoldStatus/@car.Id" class="d-inline">
-                                        <button type="submit" class="btn btn-outline-dark btn-sm fw-bold rounded-3">
-                                            @(car.IsSold ? "Mark Available" : "Mark Sold")
-                                        </button>
-                                    </form>
+                                    <div class="d-flex gap-1 flex-wrap">
+                                        <!-- sold out btn -->
+                                        <form method="post" action="/Cars/ToggleSoldStatus/@car.Id" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-dark btn-sm fw-bold rounded-3">
+                                                @(car.IsSold ? "Mark Available" : "Mark Sold")
+                                            </button>
+                                        </form>
+
+                                        <!-- edit-->
+                                        <a href="/Cars/Edit/@car.Id" class="btn btn-outline-primary btn-sm fw-bold rounded-3 px-3">
+                                            Edit
+                                        </a>
+
+                                       
+                                        <form method="post" action="/Cars/Delete/@car.Id" class="d-inline" onsubmit="return confirm('Are you completely sure you want to permanently delete this vehicle from the showroom database?');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm fw-bold rounded-3">
+                                                Remove
+                                            </button>
+                                        </form>
+                                    </div>
                                 }
                                 else if (User.IsInRole("User"))
                                 {
