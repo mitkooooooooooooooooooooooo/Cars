@@ -1,35 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Cars.Data;
 using Cars.Data.Models;
+using Cars.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Cars.Controllers
 {
     public class CarsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICarService _carService;
 
-        public CarsController(ApplicationDbContext context)
+        public CarsController(ICarService carService)
         {
-            _context = context;
+            _carService = carService;
         }
 
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> Buy(int id)
         {
-            var car = await _context.Cars.FindAsync(id);
+            var car = await _carService.GetCarByIdAsync(id);
             if (car == null) return NotFound();
 
-            if (car.IsSold)
+            var success = await _carService.BuyCarAsync(id);
+            if (!success)
             {
                 TempData["Error"] = "This car has already been sold!";
                 return RedirectToAction("Index", "Home");
             }
-
-            car.IsSold = true;
-            await _context.SaveChangesAsync();
 
             TempData["Message"] = $"Congratulations! You have successfully purchased the {car.Make} {car.Model}!";
             return RedirectToAction("Index", "Home");
@@ -39,11 +37,8 @@ namespace Cars.Controllers
         [HttpPost]
         public async Task<IActionResult> ToggleSoldStatus(int id)
         {
-            var car = await _context.Cars.FindAsync(id);
-            if (car == null) return NotFound();
-
-            car.IsSold = !car.IsSold;
-            await _context.SaveChangesAsync();
+            var success = await _carService.ToggleSoldStatusAsync(id);
+            if (!success) return NotFound();
 
             return RedirectToAction("Index", "Home");
         }
@@ -51,8 +46,8 @@ namespace Cars.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create()
         {
-            ViewBag.Categories = await _context.Categories.ToListAsync();
-            ViewBag.Dealers = await _context.Dealers.ToListAsync();
+            ViewBag.Categories = await _carService.GetAllCategoriesAsync();
+            ViewBag.Dealers = await _carService.GetAllDealersAsync();
             return View();
         }
 
@@ -65,16 +60,13 @@ namespace Cars.Controllers
 
             if (ModelState.IsValid)
             {
-                await _context.Cars.AddAsync(car);
-                await _context.SaveChangesAsync();
-
+                await _carService.CreateCarAsync(car);
                 TempData["Message"] = $"Successfully added the {car.Make} {car.Model} to the showroom grid!";
-
                 return RedirectToAction("Index", "Home");
             }
 
-            ViewBag.Categories = await _context.Categories.ToListAsync();
-            ViewBag.Dealers = await _context.Dealers.ToListAsync();
+            ViewBag.Categories = await _carService.GetAllCategoriesAsync();
+            ViewBag.Dealers = await _carService.GetAllDealersAsync();
             return View(car);
         }
 
@@ -82,25 +74,22 @@ namespace Cars.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var car = await _context.Cars.FindAsync(id);
+            var car = await _carService.GetCarByIdAsync(id);
             if (car == null) return NotFound();
-            _context.Cars.Remove(car);
 
-            await _context.SaveChangesAsync();
-
+            await _carService.DeleteCarAsync(id);
             TempData["Message"] = $"Successfully removed the {car.Make} {car.Model} from the showroom database.";
-
             return RedirectToAction("Index", "Home");
         }
-        // fir edits
+
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int id)
         {
-            var car = await _context.Cars.FindAsync(id);
+            var car = await _carService.GetCarByIdAsync(id);
             if (car == null) return NotFound();
 
-            ViewBag.Categories = await _context.Categories.ToListAsync();
-            ViewBag.Dealers = await _context.Dealers.ToListAsync();
+            ViewBag.Categories = await _carService.GetAllCategoriesAsync();
+            ViewBag.Dealers = await _carService.GetAllDealersAsync();
             return View(car);
         }
 
@@ -109,6 +98,7 @@ namespace Cars.Controllers
         public async Task<IActionResult> Edit(int id, Car car)
         {
             if (id != car.Id) return NotFound();
+
             ModelState.Remove("Category");
             ModelState.Remove("Dealer");
 
@@ -116,12 +106,11 @@ namespace Cars.Controllers
             {
                 try
                 {
-                    _context.Update(car);
-                    await _context.SaveChangesAsync();
+                    await _carService.UpdateCarAsync(car);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Cars.Any(e => e.Id == car.Id)) return NotFound();
+                    if (!await _carService.CarExistsAsync(car.Id)) return NotFound();
                     throw;
                 }
 
@@ -129,8 +118,8 @@ namespace Cars.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            ViewBag.Categories = await _context.Categories.ToListAsync();
-            ViewBag.Dealers = await _context.Dealers.ToListAsync();
+            ViewBag.Categories = await _carService.GetAllCategoriesAsync();
+            ViewBag.Dealers = await _carService.GetAllDealersAsync();
             return View(car);
         }
     }

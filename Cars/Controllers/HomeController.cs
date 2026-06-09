@@ -1,28 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Cars.Data;
+using Cars.Services.Contracts;
 
 namespace Cars.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ICarService _carService;
 
-        public HomeController(ApplicationDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public HomeController(ICarService carService)
         {
-            _context = context;
-            _userManager = userManager;
-            _roleManager = roleManager;
+            _carService = carService;
         }
 
         public async Task<IActionResult> Index()
         {
-            await DatabaseSeeder.SeedAsync(_context, _userManager, _roleManager);
-
-            var cars = await _context.Cars.ToListAsync();
+            var cars = await _carService.GetAllCarsAsync();
             return View(cars);
         }
     }

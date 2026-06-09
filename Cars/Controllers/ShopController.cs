@@ -1,29 +1,23 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Cars.Data;
+using Cars.Services.Contracts;
 
 namespace Cars.Controllers
 {
     [Authorize(Roles = "User")]
     public class ShopController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICarService _carService;
 
-        public ShopController(ApplicationDbContext context)
+        public ShopController(ICarService carService)
         {
-            _context = context;
+            _carService = carService;
         }
 
         [HttpPost]
         public async Task<IActionResult> Buy(int id)
         {
-            var car = await _context.Cars.FindAsync(id);
-            if (car != null && !car.IsSold)
-            {
-                car.IsSold = true;
-                await _context.SaveChangesAsync();
-            }
+            await _carService.BuyCarAsync(id);
             return RedirectToAction("Index", "Home");
         }
     }

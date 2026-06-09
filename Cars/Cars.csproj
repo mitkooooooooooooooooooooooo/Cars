@@ -7,6 +7,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Remove="wwwroot\lib\Services\CarService.cs" />
+	  <Content Remove="wwwroot\lib\Services\ICarService.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Include="wwwroot\lib\Services\CarService.cs" />
+	  <Compile Include="wwwroot\lib\Services\ICarService.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\Cars.Data\Cars.Data.csproj" />
 		<ProjectReference Include="..\Cars.Services\Cars.Services.csproj" />
 	</ItemGroup>
