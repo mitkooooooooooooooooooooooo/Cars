@@ -6,7 +6,7 @@ using Cars.Services.Contracts;
 
 namespace Cars.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Administrator")]
     public class DealerController : Controller
     {
         private readonly ICarService _carService;
