@@ -112,7 +112,7 @@ namespace Cars.Data
                     {
                         Make = "Lamborghini",
                         Model = "Huracan EVO Spyder",
-                        Description = "Naturally aspirated V10 beast with cutting-edge vehicle dynamics control.",
+                        Description = "Naturally aspirated V10 beast with cutting-edge vehicle dynamics control.",f
                         Price = 200000.00m,
                         Year = 2023,
                         IsSold = false,
