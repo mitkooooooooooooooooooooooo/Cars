@@ -104,7 +104,7 @@ namespace Cars.Data
                         Price = 89990.00m,
                         Year = 2024,
                         IsSold = false,
-                        ImageUrl = "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80&w=800",
+                        ImageUrl = "https://hips.hearstapps.com/mtg-prod/65f7eb061140a40008e8c78c/1-2024-tesla-model-s-front-view.jpg",
                         CategoryId = electricCat.Id,
                         DealerId = dealerId
                     },
