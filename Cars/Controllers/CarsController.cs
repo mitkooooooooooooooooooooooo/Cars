@@ -122,5 +122,4 @@ namespace Cars.Controllers
             ViewBag.Dealers = await _carService.GetAllDealersAsync();
             return View(car);
         }
-    }
 }
