@@ -114,7 +114,7 @@ namespace Cars.Controllers
                     throw;
                 }
 
-                TempData["Message"] = $"Successfully updated specifications for the {car.Make} {car.Model}!";dsdsdsdsd
+                TempData["Message"] = $"Successfully updated specifications for the {car.Make} {car.Model}!";
                 return RedirectToAction("Index", "Home");
             }
 
